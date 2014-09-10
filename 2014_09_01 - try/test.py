@@ -111,12 +111,30 @@ try:
     from lxml import etree
 except ImportError:
     import xml.etree.ElementTree as etree
+import os, glob
 
-print(os.path.join('/Users/pilgrim/diveintopython3/examples', 'humansize.py'))  
+
+pathname = os.path.join('/Users/pilgrim/diveintopython3/examples', 'humansize.py')
+print(pathname)
 
 (dirname, filename) = os.path.split(pathname)         
- import os, glob
+
 metadata_dict = {f:os.stat(f) for f in glob.glob('*test*.py')}
 
-metadata_dict['alphameticstest.py'].st_size      
+metadata_dict['test.py'].st_size      
+
+
+P__()
+duplicity_full_list = [1,2,3,4,5,4,1,2,1,4,1]
+s = set(duplicity_full_list)
+l = [ "cislicko%ikonec" % i for i in s]
+l.append("\n")
+
+print(l)
+P__()
+txt = "\n".join( 
+            ("itemek = %s" % i[:-5]) 
+            for i in l if len(i) > 1 
+        )
+print( txt )
 time.sleep(2)
