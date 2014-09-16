@@ -2488,7 +2488,7 @@
         <Expanded>true</Expanded>
       </ItemState>
       <ItemState>
-        <ItemSymbol>PTD17_UART0_TX_FTM0_CH7_FTM0_FLT1_SPI1_SIN_UserName</ItemSymbol>
+        <ItemSymbol>PTD7_UART0_TX_FTM0_CH7_FTM0_FLT1_SPI1_SIN_UserName</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
         <Value>J2_10</Value>
