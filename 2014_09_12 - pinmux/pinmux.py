@@ -201,9 +201,9 @@ class ExampleApp(tkinter.Frame):
     def GET_PTX(q,ptx):
         ''' translates the port name from user text input
          and returns the object in the list prepared for pinsettings insertion'''
-        [re.split(r'(\d+)', s) for s in ptx.upper()]
 
-        return q.PT[port]
+        (port, pin) = [re.findall(r'(\w+?)(\d+)', s)[0] for s in ptx.upper()]
+        return q.PT[port][pin]
         # dict with all the possibilities?
         # -> not a good idea
 

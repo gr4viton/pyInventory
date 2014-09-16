@@ -167,6 +167,7 @@ class ExampleApp(tkinter.Frame):
         #portDictionaries = [{ pin:val for pin,val in zip(range(q.numOfPins), ['#void#']*q.numOfPins) }] * q.numOfPorts
         portDictionaries = [['#void#']*q.numOfPins] * q.numOfPorts
         q.PTs = { char:list for char,list in zip(q.portLetters, portDictionaries) }
+#        print(q.PTs)
 
         #q.PT = { port:pins for port,pins in zip( [portLetters]*pinNumbers, range(pinNumbers )}
     def genJXY(q):
