@@ -438,8 +438,7 @@
         <ItemSymbol>PTA1_UART0_RX_FTM0_CH6_JTAG_TDI_EZP_DI_UserName</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>LEDRGB_RED/J2_4</Value>
-      </ItemState>
+        <Value>PTA1_yopthatsit/ACCEL42</Value>      </ItemState>
       <ItemState>
         <ItemSymbol>PTA1_UART0_RX_FTM0_CH6_JTAG_TDI_EZP_DI_slew_rate</ItemSymbol>
         <ReadOnly>false</ReadOnly>
@@ -492,8 +491,7 @@
         <ItemSymbol>PTA2_UART0_TX_FTM0_CH7_JTAG_TDO_TRACE_SWO_EZP_DO_UserName</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>LEDRGB_GREEN/J1_8</Value>
-      </ItemState>
+        <Value>J42</Value>      </ItemState>
       <ItemState>
         <ItemSymbol>PTA2_UART0_TX_FTM0_CH7_JTAG_TDO_TRACE_SWO_EZP_DO_slew_rate</ItemSymbol>
         <ReadOnly>false</ReadOnly>

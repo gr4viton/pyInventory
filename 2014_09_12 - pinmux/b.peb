@@ -492,7 +492,7 @@
         <ItemSymbol>PTA2_UART0_TX_FTM0_CH7_JTAG_TDO_TRACE_SWO_EZP_DO_UserName</ItemSymbol>
         <ReadOnly>false</ReadOnly>
         <UserReadOnly>false</UserReadOnly>
-        <Value>LEDRGB_GREEN/J1_8</Value>
+        <Value>J1_5</Value>
       </ItemState>
       <ItemState>
         <ItemSymbol>PTA2_UART0_TX_FTM0_CH7_JTAG_TDO_TRACE_SWO_EZP_DO_slew_rate</ItemSymbol>

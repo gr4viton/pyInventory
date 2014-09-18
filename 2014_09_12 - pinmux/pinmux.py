@@ -9,6 +9,7 @@ except ImportError:
 
 from apihelper import info
 from gr4module import *
+from xmlPars import REPLACE_xml_singalNames
 
 #import _tkinternter as tkinter
 import time
@@ -104,12 +105,16 @@ class ExampleApp(frame):
         q.txJXY.delete(1.0, END)
         q.txJXY.insert(INSERT, "\n" * (q.maxY-1) )
         q.txJXY.bind('<Return>', q.KEY_Return(q.txJXY))
-
+        #____________________________________________________
+        # btns
         q.btnPopulatePTs = tkinter.Button(q, 
                                             text='Populate ports', 
                                             command=q.INSERT_jumpersInPorts,
                                             underline=11)
-
+        q.btnSaveToPinmux = tkinter.Button(q, 
+                                            text='Save to pinmux', 
+                                            command=q.SAVE_toPinmux,
+                                            underline=0)
         # ____________________________________________________
         # bindings
         q.BIND_keyFcn(master, q.genJXY, '!^', 'qr')
@@ -145,27 +150,40 @@ class ExampleApp(frame):
         q.maxPinNumber = maxPinNumber 
         labelText = "\n".join(str(s) for s in range(maxPinNumber))
         [item.config(text=labelText,font=("Console", 8),width=2) for item in q.lbPins]
+        
+        #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        #btnInser
+        q.btnInsert = tkinter.Button(q, 
+                                            text='<- Insert <-', 
+                                            command=q.INSERT_sigName,
+                                            underline=0)
 
-
+        # txInsert
+        # txInsertPort
         #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         # Put the controls on the form
-        q.lbJX.grid(row=0,column=0,sticky=W)
-        q.eJX.grid(row=0,column=1,sticky=W)
-        q.eJY.grid(row=0,column=2,sticky=W)
-        q.btnGenJXY.grid(row=0,column=3,sticky=W)
+        q.lbJX.grid(row=1,column=0,sticky=W)
+        q.eJX.grid(row=1,column=1,sticky=W)
+        q.eJY.grid(row=1,column=2,sticky=W)
+        q.btnGenJXY.grid(row=1,column=3,sticky=W)
         
         q.lbJXY.grid(row=2,column=0,columnspan=1,rowspan=1,sticky=N+W+E)
         q.txJXY.grid(row=2,column=1,columnspan=3,rowspan=1,sticky=N+W+E,pady=1)
         
+        q.btnInsert.grid(row=0,column=3,sticky=W+S+E+N)
+
         col_s = 4 #start column #
         # why multiply by 3 ?? IDN! BUT IT WORKS
-        q.btnPopulatePTs.grid(row=0, column=col_s+1, columnspan=numOfPorts*3,sticky=N+W+E+S) 
+#        col_s +=2
+#        q.btnPopulatePTs.grid(row=0, column=col_s+1, columnspan=numOfPorts*3,sticky=N+W+E+S) 
+        q.btnPopulatePTs.grid(row=0, column=col_s+3, columnspan=1,sticky=N+W+E+S) 
+        q.btnSaveToPinmux.grid(row=0,column=col_s+5, columnspan=1,sticky=N+W+E+S) 
 
-        [lb.grid(row=1,column=n_col*2,columnspan=2) 
+        [lb.grid(row=1,column=n_col*2-col_s,columnspan=2) 
                                         for lb,n_col in zip(q.lbPTs, range(col_s,col_s+numOfPorts))]
-        [lb.grid(row=2,column=n_col*2) 
+        [lb.grid(row=2,column=n_col*2-col_s) 
                                         for lb,n_col in zip(q.lbPins, range(col_s,col_s+numOfPorts))]
-        [tx.grid(row=2,column=n_col*2+1, sticky=N+W+E+S, pady=1 ) 
+        [tx.grid(row=2,column=n_col*2+1-col_s, sticky=N+W+E+S, pady=1 ) 
                                         for tx,n_col in zip(q.txPTs, range(col_s,col_s+numOfPorts))]
         #print("\n".join(str(i) for i in q.lbPTs))
         #print(q.lbPTs)
@@ -199,6 +217,11 @@ class ExampleApp(frame):
 #        print(q.PTs)
 
         #q.PT = { port:pins for port,pins in zip( [portLetters]*pinNumbers, range(pinNumbers )}
+    def INSERT_sigName(q):
+        """ inserts signal name from text [txInsert] into dictionary [PTs]
+        as stated in [txInsertPin] """
+
+
     def BIND_keyFcn(q, bindObj, fcn, modifs, keys, *whatever):
 #        !alt #super ^ctrl +shift
         key_dict = {"!":'Alt', "#":'Super', "^":'Control', "+":'Shift'}
@@ -349,7 +372,13 @@ class ExampleApp(frame):
         ''' Makes the Enter not a newline but a down key'''
         
         return 'break' # <--------- this makes normal behaviour disabled
-    
+    def SAVE_toPinmux(q):
+        """Save file dialog to save dictionary [PTs] into xml file through module [xmlPars.py] """
+        void_str = q.str_void
+        PTs = q.PTs
+        fname = "randomPinPebCut_sdk__notRouted.peb"
+        fname_new = "b.peb"
+        REPLACE_xml_singalNames(fname, PTs, void_str, fname_new)
 
 
 def key(event):
