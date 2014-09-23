@@ -17,7 +17,7 @@ def REPLACE_xml_singalNames(fname, PTs, void_str, fname_new="////"):
     i_replace = 0 # line for replacement referencer
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     # regex settings for finding the PTX line
-    num0to32 = "(3[1-2]|[1-2][0-9]|[0-9])"
+    num0to32 = "(3[0-2]|[1-2][0-9]|[0-9])"
     portLetters = "([A-E])"
     reLine = (".*PT%s%s.*_UserName.*") % (portLetters, num0to32)
     #regex_str = ".*PT([A-E])([0-9]|[1-2][0-9]|3[1-2]).*_UserName.*"

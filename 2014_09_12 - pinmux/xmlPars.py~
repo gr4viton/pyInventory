@@ -85,7 +85,7 @@ def REPLACE_xml_singalNames(fname, PTs, void_str, fname_new="////"):
                         r = regexStr.match(line)
                         tags = r.groups()
 #                        print( tags )
-                        line = "%s>%s</%s" % (tags[0], signal_name, tags[1])
+                        line = "%s>%s</%s\n" % (tags[0], signal_name, tags[1])
  #                       print( line )
                         print("PTs[%s][%i] value replaced! sigName= %s" % (Pletter,PinNum, signal_name))
                     else:

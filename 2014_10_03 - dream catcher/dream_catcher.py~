@@ -1,0 +1,45 @@
+# Read a file
+
+def most_common(lsWords,lsIgnored):
+#    ignored = "a se v ve tam sem na".split(" ")
+    ignored = set(lsIgnored)
+    st = set(lsWords) - set(ignored)
+    return max(st, key=lsWords.count)
+
+
+if __name__ == "__main__":
+    def_ignored = ["%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"]
+    file = "dreamer.vim"    
+    with open(file, "rt") as in_file:
+        text = in_file.read()
+    text = text.lower()
+    lsWords = text.split()
+
+    coms = []
+    nWords = 242
+    for i in range(nWords):
+        ignored = coms + def_ignored
+        coms += [most_common(lsWords, ignored)]
+        print("%%%%%%\n"+" ".join(coms))
+#    print(text)
+#    print( "\n".join(coms) )
+
+
+
+
+"""
+____________________________________________________
+2014_10_03
+a se tam sem na e to no pak sme ale v - s byl z do tak byli co je ja si taxem asi byla u u cosi mì mìl mi jak jako neb
+o po bylo paxem šli za ještì šel èi chtìl aj taxme nìjak nìco ho nakonec ju .. nìjakı ve taky jsem ze jenom bo o toho on
+ jakoe k mìli oni jakdy kde aby mama já dy tu nìkdo nìjaky nevim ta nahoru ten pro nas zas vedle co.. furt nìkde a p
+øed jaxem nìjakou pod jeli šeci káou ona ji dycky paxme musel jel venku dal ty dostal moc pusu 2011-12-13" vìci sešitu
+a dom toš má "prázdniny tom øíkal cosi.. jestli -> ____________________________________________________ i zaèli jeden n
+ás jim pøes te byt jit øekl káa takovı ne paxe nam vidìl nìjake kamsi napadlo další (nebo lucka smìrem lidi dostali naš
+el ni museli hledal abych nad mam hodnì první zase kaa snu doma kole od jsme pøedtim taky.. dìcka sou ivo jo.. škole my
+ mìla jedem dole ani stihl esi nìjaci take moou pry jakysi nìkam zaèal nám bla se.. nic pøišli døív uprostøed 4 tim pr
+vni trochu hru apak potøeboval vlak / posledni kopce fakt vpravo patøe nešlo tìch nìm jet ne.. vypadalo daval tam.. díry
+ zrovna takova kterı + probudil hotel musím ti baraku zdálo koberce hydra mìsto svoje tata miloš nìjaka zaèlo kolem dva
+nebyl upe ae poøád uvidìl støíleli vzal moje jeji mu
+
+"""
