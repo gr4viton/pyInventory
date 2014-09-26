@@ -1,0 +1,75 @@
+
+#najit soubor thisMonth ve spravne složce
+#otevøít ho pro ètení
+
+#zkopírovat ho celý do textového øetìzce
+str = file
+# promazat nevyplnìné poznámky?? 
+# bacha aby se nesmazala:
+#[]
+#sadasd
+#asd
+#
+
+done = 1
+# separace notes
+while done:
+    # X = první poznámka v pracovní èásti textu
+
+    # teï se hledá jestli je X je poslední / jediná v daném mìsíci
+    #najít redex
+    a = [.]...#>?.d_
+    # nebo jestli je za ní blíže druhá poznámka
+    b = [.]...[]
+
+    c = b
+    if len(a)<len(b):
+        # tzn že je další (druhá) poznámka k X blíže než konec mìsíce 
+        # tzn bereme jako note tu kratší
+        # etc
+        c = a
+
+
+    note = str[ c.start, c.len ]
+
+    # zjistíme typ poznámky
+    # tzn co je uprostøed [] vs [x] .@..
+    note_char = redex(note,"[]")
+    switch(note_char):
+        case "x":
+            #nic
+        case "..":
+            # nic
+        case "":
+            # berem ju a zároveò 
+            # pøed òu budem dávat symbol zaøazení do historie = @@
+            undone_notes.text.add(note)
+#            undone_notes.pos.add(pos_so_far+c.start)
+    # useknem note z pracovního øetìzce
+    trimmed_len = c.start + c.len
+    str = ltrim(str,trimmed_len)
+    # a pokraèujeme další note..
+
+# znovu naètem soubor
+# zkopírovat ho celý do textového øetìzce
+str = file
+
+# projíždíme string postupnì redexem a hledáme nevyplnìné poznámky
+a = \r[] 
+# pokud nalezneme doplníme na zaèátek øádku znak archivace @@
+
+
+# nakonec pøidáme nakonec stringu èáru a všecky undone_notes
+str=str+"%%%%%%%%%%%%%%%%%%%%%%%"
+for note_text in undone_notes.text:
+    str = str + note_text
+
+# a zapíšeme do souboru
+file.write(str)
+
+
+# promazat od prázdných dní
+# * od prázdných spacích hodin
+# *
+
+# vytvoøit nový a zapsat do starého..
