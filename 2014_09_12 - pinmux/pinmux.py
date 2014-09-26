@@ -36,14 +36,9 @@ class ExampleApp(frame):
         defFont_small = ("Console", 6)
         q.SCh = "/" # SplitCharacter
         q.txPTsCounter = 0 # txPTs focus iterator
-
-        # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        # load config
-
-#        pinmux_fname = linecache.getline(q.config_fname, 1)
-        a = 'U:\Davidek\LOG\LOGBOOK\\2014_09_11 - pinMux recreation\_2014_09_11 - peby\FRDM-K64F_sdk_notRouted.peb'
-        pinmux_fname = a
-        q.config_fname = pinmux_fname + config_sufix
+        
+        q.settings_fname = "settings.ini"
+        q.LOAD_settings()
 
         # Initialize window using the parent's constructor
         frame = tk.Frame.__init__(q,
@@ -155,7 +150,7 @@ class ExampleApp(frame):
         # txFilePinmux
         q.txFilePinmux = tk.Text(q)
         q.txFilePinmux.config(font=defFont_small, height=1, width = 2)
-        q.txFilePinmux.insert(INSERT, pinmux_fname )
+        q.txFilePinmux.insert(INSERT, q.pinmux_fname )
         #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         #txPTs 
         numOfPorts = 5
@@ -336,17 +331,14 @@ class ExampleApp(frame):
 #        splited.pop()
         
         #print(splited)
-    def UPDATE_fnames(q):
-        q.save_fname = q.txFilePinmux.get(1.0,END)
-        q.config_fname = q.save_fname[:-1] + config_sufix
 
     def EXIT_program(q, *whatever):
         q.SAVE_config()
         q.destroy()
         q.exit()
     def LOAD_config(q):
-        q.UPDATE_fnames()
-
+        q.LOAD_pinmuxFname_fromText()
+        
         print("\n".join(["puvodni:","%"*80, str(q.PTs), "%"*80]))
         f = open(q.config_fname,'r')
         lins = f.readlines() 
@@ -394,9 +386,10 @@ class ExampleApp(frame):
 
 #        print("\n".join(["nove:","%"*80, str(q.PTs), "%"*80]))
         q.ACTUALIZE_view()
+
     def SAVE_config(q):
-        q.UPDATE_fnames()
-        lins = [q.save_fname]
+        q.LOAD_pinmuxFname_fromText()
+        lins = [q.pinmux_fname]
         
         strPTs = [txPT.get(1.0,END) for txPT in q.txPTs]
         lins += [("##PORT%s\n%s") % (let, strPT) for (let,strPT) in zip(q.portLetters,strPTs)]
@@ -406,6 +399,37 @@ class ExampleApp(frame):
         f.writelines(lins) 
         f.close() 
         print(lins)
+        q.SAVE_settings()
+
+    def SAVE_settings(q):
+        q.LOAD_pinmuxFname_fromText()
+
+        f = open(q.settings_fname,'w')
+        f.writelines(q.config_fname) 
+        f.close() 
+
+    def LOAD_settings(q):
+        q.pinmux_fname = linecache.getline(q.settings_fname, 1)
+        
+    def UPDATE_config_fname(q):
+        q.config_fname = q.pinmux_fname[:-1] + config_sufix
+
+    def LOAD_pinmuxFname_fromSettings(q):
+        q.LOAD_settings()
+        q.UPDATE_config_fname()
+        q.ACTUALIZE_txFilePinmux_fromVariables()
+
+
+    def LOAD_pinmuxFname_fromText(q):
+        q.pinmux_fname = q.txFilePinmux.get(1.0,END).strip()
+        q.UPDATE_config_fname()
+        q.ACTUALIZE_txFilePinmux_fromVariables()
+
+    def ACTUALIZE_txFilePinmux_fromVariables(q):
+        q.txFilePinmux.delete(1.0,END)
+        q.txFilePinmux.insert(1.0,q.pinmux_fname)
+        
+
 
     def ADD_sigNameAndActualize(q, *whatever):
         """ inserts signal name from text [txSigName] into dictionary [PTs]
@@ -423,7 +447,7 @@ class ExampleApp(frame):
         """ adds signal name = [txSigName] into dictionary [PTs]
         as stated in [txSelPin] to its current signal names """
         (suc,port, pin) = q.GET_PTX( strSelPin.strip() )
-        q.APPEND_sigName(port,pin, strSigName.strip() )
+        q.APPEND_sigName(port,pin, strSigName.strip().upper() )
 
     def ADD_sigName(q):
         """ adds signal name = [txSigName] into dictionary [PTs]
@@ -497,6 +521,7 @@ class ExampleApp(frame):
             print(signals)
             signals.append(sigName)
             q.PTs[port][pin] = q.SCh.join(signals)
+
     def GET_PTX(q, str_port):
         ''' translates the port name from user text input
          and returns the object in the list prepared for pinsettings insertion'''
@@ -540,6 +565,7 @@ class ExampleApp(frame):
     def ACTUALIZE_view(q, *whatever):
         q.UPDATE_txPTs()
         q.UPDATE_txWholeValue()
+        q.ACTUALIZE_txFilePinmux_fromVariables()
 
     def POPULATE_PTs_andActualize(q, *whatever):
         '''not used anymore'''
@@ -590,8 +616,9 @@ class ExampleApp(frame):
 #        q.
         #print(dir(tkinter))
         #info(tkinter)
-        #print(tk.TOP)
+        #print(tk.TOP())
         #print(tk.BOTTOM)
+        q.LOAD_pinmuxFname_fromSettings()
         q.genJXY()
         q.POPULATE_PTs_from_txJXY()
         q.mainloop()
@@ -605,11 +632,16 @@ class ExampleApp(frame):
         return 'break' # <--------- this makes normal behaviour disabled
     def SAVE_toPinmux(q):
         """Save file dialog to save dictionary [PTs] into xml file through module [xmlPars.py] """
+
         str_void = q.str_void
         PTs = q.PTs
-        fname = q.txFilePinmux.get(1.0,END).strip()
+
+        LOAD_pinmuxFname_fromText()
+        fname = q.pinmux_fname
         fname_new = fname
+
         REPLACE_xml_singalNames(fname, PTs, str_void, fname_new, makebackup=True)
+        q.SAVE_settings()
 
 
 def key(event):
