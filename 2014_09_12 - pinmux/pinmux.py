@@ -10,6 +10,7 @@ except ImportError:
 from apihelper import info
 from gr4module import *
 from xmlPars import REPLACE_xml_singalNames
+from xmlPars import GET_xml_singalNames
 
 import linecache # for config loading
 
@@ -34,7 +35,7 @@ class ExampleApp(frame):
     def __init__(q, master):
         defFont = ("Console", 8)
         defFont_small = ("Console", 6)
-        q.SCh = "/" # SplitCharacter
+        q.sch = "/" # SplitCharacter
         q.txPTsCounter = 0 # txPTs focus iterator
         
         q.settings_fname = "settings.ini"
@@ -115,7 +116,7 @@ class ExampleApp(frame):
         q.txJXY.config(font=defFont, width=10)
         q.txJXY.delete(1.0, END)
         q.txJXY.insert(INSERT, "\n" * (q.maxY-1) )
-
+        #____________________________________________________
         # txInsertMore
         q.txInsertMore = tk.Text(q)
         q.txInsertMore.config(font=defFont, height=10, width = 20 )
@@ -127,6 +128,19 @@ class ExampleApp(frame):
                                             text='Add more', 
                                             command=q.ADD_more,
                                             underline=6)
+
+        #____________________________________________________
+        # txAddOther - adds ADC/DAC etc new signalnames
+        q.txAddOther = tk.Text(q)
+        q.txAddOther.config(font=defFont, height=10, width = 20 )
+ #       q.txJXY.delete(1.0, END)
+#        q.txInsertMore.insert(INSERT, "" )
+
+        # btnAddOther
+        q.btnAddOther = tk.Button(q, 
+                                            text='Add other', 
+                                            command=q.ACTUALIZE_OSN)
+
         #____________________________________________________
         # btns
         q.btnPopulatePTs = tk.Button(q, 
@@ -137,6 +151,11 @@ class ExampleApp(frame):
                                             text='Save to pinmux', 
                                             command=q.SAVE_toPinmux,
                                             underline=0)
+        q.btnLoadFromPinmux = tk.Button(q, 
+                                            text='Load from pinmux', 
+                                            command=q.LOAD_fromPinmux,
+                                            underline=0)
+        
 
         q.btnLoadConfig = tk.Button(q, 
                                             text='Load config', 
@@ -150,7 +169,7 @@ class ExampleApp(frame):
         # txFilePinmux
         q.txFilePinmux = tk.Text(q)
         q.txFilePinmux.config(font=defFont_small, height=1, width = 2)
-        q.txFilePinmux.insert(INSERT, q.pinmux_fname )
+        q.txFilePinmux.insert(INSERT, q.pinmuxFname )
         #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         #txPTs 
         numOfPorts = 5
@@ -161,7 +180,8 @@ class ExampleApp(frame):
         q.txPTs = [tk.Text(q) for i in range(numOfPorts)]
         
         txPTs_width = 32
-        [item.config(font=defFont,width=txPTs_width,wrap=NONE) for item in q.txPTs]
+        txPTs_height = 32
+        [item.config(font=defFont,width=txPTs_width,height=txPTs_height,wrap=NONE) for item in q.txPTs]
 
         #txPT
         q.txPT = {key:value for key, value in zip( portLetters, q.txPTs ) }
@@ -223,6 +243,10 @@ class ExampleApp(frame):
         
         q.txInsertMore.grid(row=5,column=0,columnspan=4,rowspan=1,sticky=S+N+W+E,pady=1)
         q.btnInsertMore.grid(row=5,column=4,columnspan=1,rowspan=1,sticky=S+N+W+E,pady=1)
+        
+        q.txAddOther.grid(row=5,column=5,columnspan=1,rowspan=1,sticky=S+N+W+E,pady=1)
+        q.btnAddOther.grid(row=5,column=6,columnspan=1,rowspan=1,sticky=S+N+W+E,pady=1)
+        
         #____________________________________________________
         # pin selector, adder and inserter
         q.txSelPin.grid(row=0,column=1,columnspan=2,rowspan = 2)
@@ -241,6 +265,7 @@ class ExampleApp(frame):
         q.btnActualize.grid(row=1,column=6,columnspan=2,sticky=W+S+E+N)
 
         q.btnSaveToPinmux.grid(row=0,column=col_s+5, columnspan=1,sticky=N+W+E+S) 
+        q.btnLoadFromPinmux.grid(row=0,column=col_s+7, columnspan=1,sticky=N+W+E+S) 
         q.txFilePinmux.grid(row=1,column=col_s+5, columnspan=6,sticky=N+W+E+S) 
 
         q.btnSaveConfig.grid(row=2,column=col_s+5, columnspan=1,sticky=N+W+E+S) 
@@ -248,11 +273,11 @@ class ExampleApp(frame):
 
         # ____________________________________________________
         # txPTs
-        [lb.grid(row=3,column=n_col*2-col_s,columnspan=2) 
+        [lb.grid(row=3,column=n_col*2-col_s,columnspan=2,sticky=W+S+E) 
                                         for lb,n_col in zip(q.lbPTs, range(col_s,col_s+numOfPorts))]
-        [lb.grid(row=4,column=n_col*2-col_s) 
+        [lb.grid(row=4,column=n_col*2-col_s,sticky=N+E) 
                                         for lb,n_col in zip(q.lbPins, range(col_s,col_s+numOfPorts))]
-        [tx.grid(row=4,column=n_col*2+1-col_s, sticky=N+W+E+S, pady=1 ) 
+        [tx.grid(row=4,column=n_col*2+1-col_s, sticky=N+W+E, pady=1 ) 
                                         for tx,n_col in zip(q.txPTs, range(col_s,col_s+numOfPorts))]
         #print("\n".join(str(i) for i in q.lbPTs))
         #print(q.lbPTs)
@@ -282,8 +307,11 @@ class ExampleApp(frame):
 #        pta = { pin:val for pin,val in zip(range(numOfPins), ['#void#']*numOfPins) }
         #dictP = [{ pin:val for pin,val in zip(range(q.numOfPins), ['#void#']*q.numOfPins) }] * q.numOfPorts
         dictP = [ [str_void]*q.numOfPins for i in range(q.numOfPorts) ]
+        # for port pin signalNames
         q.PTs = { char:list for char,list in zip(q.portLetters, dictP) }
 #        print(q.PTs)
+        # for other signalNames (ADC,DAC..)
+        q.OSN = {}
 
         #q.PT = { port:pins for port,pins in zip( [portLetters]*pinNumbers, range(pinNumbers )}
 
@@ -326,7 +354,8 @@ class ExampleApp(frame):
         q.ACTUALIZE_view()
     def ADD_more(q):
         lines = q.txInsertMore.get(1.0,END).split("\n")
-        [ q.ADD_sigNameFrom( *(line.split("=")) ) for line in lines if line != ""]
+        [ q.ADD_sigNameFrom( *(line.split("=")) ) for line in lines if (line != "" and line.split("=")[1] != "") ]
+ 
         q.ACTUALIZE_view()
 #        splited.pop()
         
@@ -355,7 +384,7 @@ class ExampleApp(frame):
         #    print( str(iline) )
         #    print( q.portLetters[iport])
         
-        
+        # create void PTs
         for iport in range(0, q.numOfPorts):
             q.PTs[q.portLetters[iport]] = [q.str_void] * q.numOfPins
         
@@ -371,10 +400,17 @@ class ExampleApp(frame):
         # delete [##end] element
         PP[-1] = PP[-1][:-1]
 
+        
         for i in range(0, q.numOfPorts):
             for w in range(0, q.numOfPins):
-                if PP[i][w] == "":
+                # if it is blank or empty -> make it clear
+                if PP[i][w] in ("", " "):
                     PP[i][w] = q.str_void #"volno" 
+                else:
+                    # if the last character is / - delete it
+                    if PP[i][w][-1] == "/":
+                        PP[i][w] = PP[i][w][:-1]
+                
 #        [pin = "volno" for pin in port if pin == ""]
         #pin = ["volno" for pin in port for port in PP if pin == ""]
         print(PP)
@@ -389,7 +425,7 @@ class ExampleApp(frame):
 
     def SAVE_config(q):
         q.LOAD_pinmuxFname_fromText()
-        lins = [q.pinmux_fname]
+        lins = [q.pinmuxFname]
         
         strPTs = [txPT.get(1.0,END) for txPT in q.txPTs]
         lins += [("##PORT%s\n%s") % (let, strPT) for (let,strPT) in zip(q.portLetters,strPTs)]
@@ -405,14 +441,14 @@ class ExampleApp(frame):
         q.LOAD_pinmuxFname_fromText()
 
         f = open(q.settings_fname,'w')
-        f.writelines(q.config_fname) 
+        f.writelines(q.pinmuxFname) 
         f.close() 
 
     def LOAD_settings(q):
-        q.pinmux_fname = linecache.getline(q.settings_fname, 1)
+        q.pinmuxFname = linecache.getline(q.settings_fname, 1)
         
     def UPDATE_config_fname(q):
-        q.config_fname = q.pinmux_fname[:-1] + config_sufix
+        q.config_fname = q.pinmuxFname[:] + config_sufix
 
     def LOAD_pinmuxFname_fromSettings(q):
         q.LOAD_settings()
@@ -421,13 +457,13 @@ class ExampleApp(frame):
 
 
     def LOAD_pinmuxFname_fromText(q):
-        q.pinmux_fname = q.txFilePinmux.get(1.0,END).strip()
+        q.pinmuxFname = q.txFilePinmux.get(1.0,END).strip()
         q.UPDATE_config_fname()
         q.ACTUALIZE_txFilePinmux_fromVariables()
 
     def ACTUALIZE_txFilePinmux_fromVariables(q):
         q.txFilePinmux.delete(1.0,END)
-        q.txFilePinmux.insert(1.0,q.pinmux_fname)
+        q.txFilePinmux.insert(1.0,q.pinmuxFname)
         
 
 
@@ -447,13 +483,13 @@ class ExampleApp(frame):
         """ adds signal name = [txSigName] into dictionary [PTs]
         as stated in [txSelPin] to its current signal names """
         (suc,port, pin) = q.GET_PTX( strSelPin.strip() )
-        q.APPEND_sigName(port,pin, strSigName.strip().upper() )
+        q.APPEND_sigNames(port,pin, strSigName.strip().upper() )
 
     def ADD_sigName(q):
         """ adds signal name = [txSigName] into dictionary [PTs]
         as stated in [txSelPin] to its current signal names """
         (suc,port, pin) = q.GET_PTX( q.txSelPin.get(1.0, END).strip() )
-        q.APPEND_sigName(port,pin, q.txSigName.get(1.0, END).strip() )
+        q.APPEND_sigNames(port,pin, q.txSigName.get(1.0, END).strip() )
 
     def INSERT_sigName(q):
         """ inserts signal name = [txSigName] into dictionary [PTs]
@@ -509,18 +545,21 @@ class ExampleApp(frame):
         #print("\n".join("J%i_" % X 
         #        for X in range(1, 1+int(q.eJY_val.get()))                
         #        ))
+    def APPEND_sigNames(q,port,pin,sigNames):
+        [q.APPEND_sigName(port,pin, sigName ) for sigName in sigNames.split(q.sch)]
     def APPEND_sigName(q,port,pin,sigName):
+        sigName = sigName.upper()
         if sigName == q.str_void:
             return
         if q.PTs[port][pin] == q.str_void:
             q.PTs[port][pin] = sigName
             return
-        signals = str(q.PTs[port][pin]).split(q.SCh)
+        signals = str(q.PTs[port][pin]).split(q.sch)
         ss = set(signals)
         if sigName not in set(signals):
             print(signals)
             signals.append(sigName)
-            q.PTs[port][pin] = q.SCh.join(signals)
+            q.PTs[port][pin] = q.sch.join(signals)
 
     def GET_PTX(q, str_port):
         ''' translates the port name from user text input
@@ -541,7 +580,7 @@ class ExampleApp(frame):
                 (success, port, pin) = q.GET_PTX(line) 
                 print("PT%s%i=%s" % (port, pin, str_J))
                 if success == 1:
-                    q.APPEND_sigName(port,pin,str_J)
+                    q.APPEND_sigNames(port,pin,str_J)
     #            print('path: {}'.format(line))
         
         print(q.PTs)
@@ -561,8 +600,13 @@ class ExampleApp(frame):
         #insert contains of strPort
         [ tx.insert(INSERT,strP[port]) for tx, port in zip(q.txPTs, range(q.numOfPorts)) ]
 
-
+    def CORRECT_syntax(q):
+        #...
+        pass
     def ACTUALIZE_view(q, *whatever):
+        q.CORRECT_syntax()
+        q.ACTUALIZE_OSN()
+
         q.UPDATE_txPTs()
         q.UPDATE_txWholeValue()
         q.ACTUALIZE_txFilePinmux_fromVariables()
@@ -630,19 +674,50 @@ class ExampleApp(frame):
         ''' Makes the key do nothing'''
         #print(evt)
         return 'break' # <--------- this makes normal behaviour disabled
+    def ACTUALIZE_OSN(q):
+        txt = q.txAddOther.get(1.0, END)
+        #txt = """ADC1_DM0 = J500_2/J2_1
+#ADC0_SE9 = J500_12"""
+        if not txt: 
+            return
+        list = txt.split("\n")
+#        list_item.split("=")
+#        print(list)
+#        print( [list_item for list_item in list] )
+        q.OSN = { pin.strip():sigName.strip() for pin,sigName in 
+                [ list_item.split("=") for list_item in list 
+                    if list_item.strip() != ""
+                    ]  }
+        print(q.OSN)
+
     def SAVE_toPinmux(q):
         """Save file dialog to save dictionary [PTs] into xml file through module [xmlPars.py] """
+        q.ACTUALIZE_view()
 
         str_void = q.str_void
         PTs = q.PTs
+        OTHERsigNames = q.OSN
 
-        LOAD_pinmuxFname_fromText()
-        fname = q.pinmux_fname
+        q.LOAD_pinmuxFname_fromText()
+        fname = q.pinmuxFname.strip()
         fname_new = fname
 
-        REPLACE_xml_singalNames(fname, PTs, str_void, fname_new, makebackup=True)
+        REPLACE_xml_singalNames(fname, PTs, OTHERsigNames, str_void, fname_new, makebackup=True)
         q.SAVE_settings()
 
+    def LOAD_fromPinmux(q):
+        fname = q.pinmuxFname.strip()
+
+        # "u:\Davidek\LOG\LOGBOOK\2014_09_11 - pinMux recreation\_2014_09_11 - peby\renamed signals etc\F-K64F\pinmux_FRDM-K64F_sdk_FINAL.peb" 
+        q.LOAD_pinmuxFname_fromText()
+        fname = q.pinmuxFname
+        parse_text = GET_xml_singalNames(fname,q.PTs)
+        
+        q.txInsertMore.delete(1.0, END)
+        q.txInsertMore.insert(INSERT, parse_text )
+        q.ADD_more()
+
+        #q.POPULATE_PTs_andActualize()
 
 def key(event):
     print("pressed", repr(event.char))
