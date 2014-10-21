@@ -141,7 +141,7 @@ def PARSE(fname):
     rgs = r.groups()
 
     print(help(txt.splitlines))
-    rgs = txt.splitlines(True,SN)
+    rgs = txt.splitlines(True).split(SN)
     
     # multiline split
     for note in rgs:

@@ -1,0 +1,43 @@
+
+FILL_dimensionDict()
+
+def FILL_dimensionDict():
+    # scrap data from http://www.fileformat.info/media/measurements.htm
+    # or from a cached file on disk
+    SMdimDict{ 
+            "floppy":   (93.7,  90.0,   3.3), 
+            "microsd":  (15.0,  11.0,   0.8),
+            "SD":       (24,    32,     2.1)
+strCmd = {"listStorages":"list"}
+def ROTATE_dimMeas( dim1, dim2 )
+    """To be more precise to change relative rotation of storage medias to fit more of them"""
+
+def GET_dimMeas( dim1, dim2 ):
+    """ try to fit dim1 into dim2 """
+    rel = [0] * 3
+    #if( dim1[1] > dim2[1] ):
+    rel = [ dim1[i] // dim2[i] for i in range(3) ]
+    return rel
+
+def GET_dimFromName(SM1, SM2):
+    """ SM = StorageMedia 
+    ignore Z-dimension?
+    """
+    SMstr = ( SM1.lower(), SM2.lower() )
+    strBad = []
+    [strBad.append(strX) for strX in SMstr if strX not in SMdim]
+    if strBad == "[]":
+        #every storage device find in SMdim
+        SMdim = []
+        [ SMdim.append( SMdimDict[str] ) for str in SMstr ]
+        return GET_dimMeas( SMdim )
+    else:
+        print( \
+            """[%s] is not recognized as a type of media.
+            Type [%s] for a list of storages.""" % (strBad, strCmd("listStorages") ) )
+        exit()
+
+if __name__ == "main":
+    dims = GET_dimFromName("floppy","microsd")
+    rel = GET_dimMeas(dims)
+    print(rel)
