@@ -36,8 +36,9 @@ def most_common(lsWords,lsIgnored):
 
 if __name__ == "__main__":
     def_ignored = ["%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"]
-    file = "dreamer.vim"    
-    with open(file, "rt") as in_file:
+    fname = "dreamer.vim"
+    fpath = "E:\\GDRIVE\\LOG\\" + fname
+    with open(fpath, "rt") as in_file:
         text = in_file.read()
     #lower
     text = text.lower()

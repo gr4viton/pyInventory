@@ -54,7 +54,7 @@ if __name__ == "__main__":
 #    coms = []
     coms = most_common(lsWords, def_ignored)
 #    print("%%%%%%\n"+" ".join(coms))
-    nWords = 42
+    nWords = 442
 #    print( "\n".join( [ ("%s=%s" % coms[i]) for i in range(2)] ) )
 #    for com in coms[:10]: print( [ "%s = %s" % com ])
 #    print([ ("%s = %s" % com) for com in coms[:10] ])

@@ -69,4 +69,7 @@ file.write(str)
 
 
 # promazat od prázdných dní
-# od prázdných spacích hodin
+# * od prázdných spacích hodin
+# *
+
+# vytvoøit nový a zapsat do starého..

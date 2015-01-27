@@ -1,0 +1,116 @@
+import os, sys, winshell
+from win32com.client import Dispatch
+import re
+
+
+#retxList = [ "(ls.*)\.gsheet", "(p.*)\.gsheet" ]
+
+
+shortcut_ext = ".lnk"
+shell = Dispatch('WScript.Shell')
+
+
+    #            desktop = winshell.desktop()
+shortcut_dir = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\_ALL_START\GDRIVE\_generated"
+
+print_it = 1
+
+d = {}
+def GO(rootdir,print_it,retx,ext):
+
+    print(retx)
+    #retx = retxList[0]
+    rex = re.compile(retx)
+
+    n_shortcuts = 0
+    for root, subFolders, files in os.walk(rootdir):
+        for file in files:
+            r = rex.match(file)
+            if r:
+                name = r.groups()[0]
+                key = name + "_" + root
+                d[key] = (root, name)
+            # if r2
+
+    
+    for (root, name) in d.values():
+
+        vars = GET_variables(root, name,ext)
+#        (shortcut_path, target_path, working_directory, icon_path) = vars
+
+        n_shortcuts = CREATE_shortcut(*(vars), print_it=n_shortcuts)          
+#        n_shortcuts=CREATE_shortcut(shortcut_path, target_path, working_directory, icon_path, n_shortcuts)          
+#        n_shortcuts=CREATE_shortcut(shortcut_path, target_path, working_directory, icon_path, n_shortcuts)
+    return n_shortcuts 
+
+def GET_variables(root,name,ext):
+#    ext = ".gsheet"
+    file = name + '.' + ext
+    target_path = os.path.join(root, file)
+    working_directory = root
+    icon_path = target_path
+
+    textext = " %s " % (ext)
+    shortcut_name = name + text_ext + shortcut_ext;
+    shortcut_path = os.path.join(shortcut_dir, shortcut_name)
+    
+
+    return (shortcut_path, target_path, working_directory, icon_path)
+
+
+def CREATE_shortcut( shortcut_path, target_path, working_directory, icon_path, print_it ):
+    shortcut = shell.CreateShortCut(shortcut_path)
+    shortcut.Targetpath = target_path
+    shortcut.WorkingDirectory = working_directory
+    shortcut.IconLocation = icon_path
+    shortcut.save()
+    
+
+    if print_it:
+        start_line = "___"*12+"\nCREATED NEW SHORTCUT (%s so far):" % print_it
+        print("%s\n" % start_line +
+              "shortcut_path:\t%s\n" % shortcut_path +
+              "target_path:\t%s\n" % target_path +
+              "working_dir:\t%s\n" % working_directory +
+              "icon_path:\t%s\n" % icon_path )
+
+
+    print_it = print_it +1        
+    return print_it 
+        
+if __name__ == "__main__":
+    n_shortcuts = 0
+    #pth = "E:\GDRIVE"
+    # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    # gdocs and sheets
+    pthList = [ 
+            "E:\GDRIVE\_LISTS",
+            "E:\GDRIVE\_PROJECTS",
+            "E:\GDRIVE\_BUY"
+            ]
+
+    lsNam = [ "ls.*", "p.*", "log.*"]
+    ext = 'gsheet'
+
+    retx = "(%s)\.%s" % ( '|'.join( lsNam ), ext )
+    for pth in pthList:
+        rootdir = os.path.abspath(pth)
+        print(rootdir)
+        n_shortcuts = GO(rootdir, n_shortcuts, retx, ext)
+
+    # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    # vims
+    pthList = [ 
+            "E:\GDRIVE"
+            ]
+    
+    lsNam = [".*"]
+    ext = 'vim'
+
+    retx = "(%s)\.%s" % ( '|'.join( lsNam ), ext )
+    for pth in pthList:
+        rootdir = os.path.abspath(pth)
+        print(rootdir)
+        n_shortcuts = GO(rootdir, n_shortcuts, retx, ext)
+
+
