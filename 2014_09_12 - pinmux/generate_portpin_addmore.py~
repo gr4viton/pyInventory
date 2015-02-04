@@ -3,7 +3,7 @@
 letters = "abcde".upper()
 tx = ""
 for let in letters:
-    for pin in range(0,32):
+    for pin in range(0,31):
         tx+=("%s%i= \n" % (let,pin))
     tx+="\n"
 #tx = "\n".join( [[ ("%s%i =") % (let, pin) 

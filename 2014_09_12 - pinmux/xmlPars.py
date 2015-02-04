@@ -35,7 +35,7 @@ def REPLACE_xml_singalNames(fname, PTs, OSN, void_str, fname_new="////", makebac
     #regex_str = ".*PT([A-E])([0-9]|[1-2][0-9]|3[1-2]).*_UserName.*"
     regexLine = re.compile(reLine)
 
-    pinNames = ("ADC,DAC,CMP,UART,JTAG,RST,RST,USB")
+    pinNames = ("ADC,DAC,CMP,UART,JTAG,RST,RESET,USB")
     pinList = pinNames.split(",")
     reOther = ".*(%s).*_UserName.*" % "|".join(pinList)
     regexOther = re.compile(reOther)

@@ -27,8 +27,11 @@ config_sufix = "_pinmux.vim"
 
 frame = tk.Frame
 class ExampleApp(frame):
-    ''' An example application for TkInter.  Instantiate
-        and call the run method to run. '''
+    ''' App for faster [User signal name] definig for pinmux settings in Processor Expert related sw 
+    it writes into xml file [pinmux.peb] directly, 
+    through its convenient, easy to use and quick to insert enviroment the rewriting from schematic datasheets is a bliss
+    created by [gr4viton] on 2014_10
+    '''
     rec_i = 0
     recs = ['world', 'suckers', 'pals', 'mutants', 'meatbags', 'zombies']
     
@@ -354,7 +357,7 @@ class ExampleApp(frame):
         q.ACTUALIZE_view()
     def ADD_more(q):
         lines = q.txInsertMore.get(1.0,END).split("\n")
-        [ q.ADD_sigNameFrom( *(line.split("=")) ) for line in lines if (line != "" and line.split("=")[1] != "") ]
+        [ q.ADD_sigNameFrom( *(line.split("=")) ) for line in lines if (line.strip() != "" and line.split("=")[1].strip() != "") ]
  
         q.ACTUALIZE_view()
 #        splited.pop()
@@ -403,12 +406,16 @@ class ExampleApp(frame):
         
         for i in range(0, q.numOfPorts):
             for w in range(0, q.numOfPins):
-                # if the last character is / - delete it
-                if PP[i][w][-1] == "/":
-                    PP[i][w] = PP[i][w][:-1]
                 # if it is blank or empty -> make it clear
-                if PP[i][w] in ("", " "):
+                if PP[i][w].strip() in (""):
                     PP[i][w] = q.str_void #"volno" 
+                else:
+                    # if the last character is / - delete it
+                    if PP[i][w][-1] == "/":
+                        PP[i][w] = PP[i][w][:-1]
+                    # if the first character is / - delete it
+                    if PP[i][w][0] == "/":
+                        PP[i][w] = PP[i][w][1:]
                 
 #        [pin = "volno" for pin in port if pin == ""]
         #pin = ["volno" for pin in port for port in PP if pin == ""]
