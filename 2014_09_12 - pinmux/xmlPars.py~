@@ -145,26 +145,36 @@ def REPLACE_xml_singalNames(fname, PTs, OSN, void_str, fname_new="////", makebac
     f.close() # you can omit in most cases as the destructor will call if
     
     print("%"*42)
-#    print("Replaced these: \nmin:\n%s\nmax:\n%s" % ( str(min), str(max) ) )
-    mima = "\n".join( sorted( ["%s[<%i;%i>]= %i pcs\t=%s" % (port,min[port],max[port],len(rep[port]),rep[port]) for port in min.keys()] ) )
-    mimaOther = "\n".join(repOther)
-    print("Replaced these: \n%s\n%s" % (mima,mimaOther))
+    #____________________________________________________replaced
+    len_rep = sum( [len(v) for k,v in rep.items()] )
 
-    mima = "\n".join( sorted( ["%s = %i pcs\t=%s" % (port,len(nrep[port]),nrep[port]) for port in nrep.keys()] ) )
-    print("Not replaced these, but could have (user signal name changeable): \n%s" % mima)
+    mima = "\n".join( sorted( ["%s[<%i;%i>]= %i pcs \t=%s" % 
+        ( port, min[port], max[port], len(rep[port]), rep[port] ) for port in min.keys()] ) )
+
+    mimaOther = "\n".join(repOther)
+    print("Replaced these: (%i pcs)\n%s\n%s" % (len_rep, mima,mimaOther))
+#    print("Replaced these: \nmin:\n%s\nmax:\n%s" % ( str(min), str(max) ) )
+
+    #____________________________________________________not replaced
+    len_nrep = sum( [len(v) for k,v in nrep.items()] )
+
+    mima = "\n".join( sorted( ["%s = %i pcs\t=%s" % 
+        ( port, len(nrep[port]), nrep[port] ) for port in nrep.keys()] ) )
+    print("Not replaced these, but could have (user signal name changeable): (%i pcs)\n%s" 
+            % (len_nrep, mima))
 
     
+    #____________________________________________________other
     allOther = set(OSN.keys())
     nrepOther = allOther.difference( set(repOther) )
-    
+    len_nrepOther = sum( [len(v) for k,v in nrepOther.items()] )
+
     mima = "\n".join( 
             ["%s\t= %s" % (key,value) for key,value in
                 [(nrep_item, OSN.get(nrep_item)) for nrep_item in nrepOther ] 
             ] )
-
-    print("Need to add manually:")
-    print(mima)
-    print("end")
+    print("Need to add manually: (%i pcs)\n%s\nend" % 
+            (len_nrepOther, mima) )
          
 
 #
