@@ -146,12 +146,12 @@ def REPLACE_xml_singalNames(fname, PTs, OSN, void_str, fname_new="////", makebac
     
     print("%"*42)
 #    print("Replaced these: \nmin:\n%s\nmax:\n%s" % ( str(min), str(max) ) )
-    mima = "\n".join( ["%s[%i-%i]\t=%s" % (port,min[port],max[port],rep[port]) for port in min.keys()] )
+    mima = "\n".join( sorted( ["%s[<%i;%i>]= %i pcs \t=%s" % (port,min[port],max[port],len(rep[port]),rep[port]) for port in min.keys()] ) )
     mimaOther = "\n".join(repOther)
     print("Replaced these: \n%s\n%s" % (mima,mimaOther))
 
-    mima = "\n".join( ["%s \t=%s" % (port,nrep[port]) for port in nrep.keys()] )
-    print("Not replaced these: \n%s" % mima)
+    mima = "\n".join( sorted( ["%s = %i pcs\t=%s" % (port,len(nrep[port]),nrep[port]) for port in nrep.keys()] ) )
+    print("Not replaced these, but could have (user signal name changeable): \n%s" % mima)
 
     
     allOther = set(OSN.keys())

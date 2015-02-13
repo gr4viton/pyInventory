@@ -92,19 +92,24 @@ class ExampleApp(frame):
                                     command=q.POPULATE_PTs_andActualize)#,
                                     #e
                                     #underline=7) 
-        #btn genJXY
-        q.btnGenJXY = tk.Button(q.frJump,
-                                   text='Regenerate field',
-                                   command=q.genJXY,
+        #btn JUMP_regenerate
+        q.btnJumpRegen = tk.Button(q.frJump,
+                                   text='Regenerate all',
+                                   command=q.JUMP_regenerate,
                                    underline=0)
-        #btn JX1
+        #btn pinRegenreate
+        q.btnJumpPinActu = tk.Button(q.frJump,
+                                   text='Actualize pins',
+                                   command=q.JUMP_ACT_pinLabels,
+                                   underline=0)
+
         #____________________________________________________labels
         # label JX_[1:Y]
-        q.lbJX = tk.Label(q.frJump, text='JX_[1:Y]=')   #Label(q, text='JX_[1:Y]=')
+        q.lbJX = tk.Label(q.frJump, justify=RIGHT, anchor=N+E, text='JX_[1:Y]=')   #Label(q, text='JX_[1:Y]=')
         #lbJXY
         q.lbJXY_val = tk.StringVar()
         q.lbJXY = tk.Label(q.frJump, textvariable=q.lbJXY_val, 
-                justify=RIGHT, anchor=N, font=defFont)
+                justify=RIGHT, anchor=N+E, font=defFont)
         q.lbJXY_val.set('')
         #____________________________________________________entries
         # txt JX
@@ -126,18 +131,19 @@ class ExampleApp(frame):
         q.txJXY.insert(INSERT, "\n" * (q.maxY-1) )
         #____________________________________________________ GRID inside frame
         # JX_generator        
-        q.btnPopulatePTs.grid(row=2, column=0, columnspan=4, sticky=N+W+E+S) 
 
-        q.lbJX.grid     (row=3, column=0, sticky=W)
-        q.eJX.grid      (row=3, column=1, sticky=W)
-        q.eJY.grid      (row=3, column=2, sticky=W)
 
-        q.btnGenJXY.grid(row=4, column=0, sticky=W, columnspan=4)
+        q.lbJX.grid     (row=1, column=0, sticky=W)
+        q.eJX.grid      (row=1, column=1, sticky=W)
+        q.eJY.grid      (row=1, column=2, sticky=W)
+
+        q.btnJumpPinActu.grid (row=2, column=0, sticky=N+W+E, columnspan=1)
+        q.btnJumpRegen.grid   (row=2, column=1, sticky=N+W+E, columnspan=2)
+
+        q.lbJXY.grid(row=3, column=0, columnspan=1, rowspan=1, sticky=N+W+E)
+        q.txJXY.grid(row=3, column=1, columnspan=3, rowspan=1, sticky=N+W+E, pady=1)
         
-        q.lbJXY.grid(row=5, column=0, columnspan=1, rowspan=1, sticky=N+W+E)
-        q.txJXY.grid(row=5, column=1, columnspan=3, rowspan=1, sticky=N+W+E,pady=1)
-        
-        
+        q.btnPopulatePTs.grid(row=0, column=0, columnspan=4, sticky=N+W+E+S)         
 
         #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         #:: frAddList
@@ -365,12 +371,15 @@ class ExampleApp(frame):
         # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         modifs = '!'
         # button shortcuts
-        q.BIND_keyFcn(master, q.genJXY, modifs, 'gq')
-        q.BIND_keyFcn(master, q.POPULATE_PTs_andActualize, modifs, 'pe')
+        q.BIND_keyFcn(master, q.JUMP_regenerate, modifs, 'gq')
+        q.BIND_keyFcn(master, q.POPULATE_PTs_andActualize, modifs, 'p')
         q.BIND_keyFcn(master, q.ADD_sigNameAndActualize, modifs, 'air')
         q.BIND_keyFcn(master, q.ACTUALIZE_view, modifs, 'v')
         q.BIND_keyFcn(master, q.SAVE_toPinmux, modifs, 's')
-
+        
+        # add path
+        q.BIND_keyFcn(master, q.PATH_setOnly, modifs, 'e')
+        
         # exit
         q.BIND_keyFcn(master, q.EXIT_program, modifs, 'q')
 #        master.bind("<Shift-Escape>", q.EXIT_program) 
@@ -389,9 +398,12 @@ class ExampleApp(frame):
         [item.bind(key, q.KEY_disable(item)) for item in items for key in keys]
 
 
-        q.txSigName.bind('<Return>', q.KEY_disable(q.txJXY))
-        q.txSelPin.bind('<Return>', q.KEY_disable(q.txJXY))
+        q.txSigName.bind('<Return>', q.KEY_disable(q.txSigName))
+        q.txSelPin.bind('<Return>', q.KEY_disable(q.txSelPin))
         q.txJXY.bind('<Return>', q.KEY_disable(q.txJXY))
+        
+        # ____________________________________________________
+        q.txPath.bind('<Return>', q.PATH_setOnly(q.txPath))
         
         # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         # view
@@ -520,7 +532,12 @@ class ExampleApp(frame):
         
     def PATH_set(q):
         q.lbPath_val.set( q.txPath.get(1.0,END).strip() )
+        print( "Current path is: %s" % q.lbPath_val.get() )
 
+    def PATH_setOnly(q,evt):
+        q.PATH_set()
+        #return q.KEY_disable(q.txJXY)
+        return 'break'
 
     def ADD_sigNameAndActualize(q, *whatever):
         """ inserts signal name from text [txSigName] into dictionary [PTs]
@@ -569,28 +586,35 @@ class ExampleApp(frame):
         str_keys += [ "<%s-%s>" % (key_dict[modif],key_name) for modif in list(modifs) for key_name in list(keys)]
         [bindObj.bind(str_key, fcn) for str_key in str_keys]
 
-    def genJXY(q, *whatever):
-        ''' Generates JX_[1:Y] list inside txJXY'''
-        JX = int(q.eJX_val.get())
-        maxY = int(q.eJY_val.get())
-
-        q.JX = JX
-        strJumperPins = ["J%i_%i" % (X,Y) for X,Y in zip( (JX,) * (1+maxY) , range(1, maxY+1 ) )]
-
-
+    def JUMP_ACT_variables(q):
+        q.JX = int(q.eJX_val.get())
+        q.maxY = int(q.eJY_val.get())
+        
+    def JUMP_ACT_pinLabels(q):
+        q.JUMP_ACT_variables()
+        strJumperPins = ["J%i_%i" % (X,Y) for X,Y in zip( (q.JX,) * (1+q.maxY) , range(1, q.maxY+1 ) )]
         q.lbJXY_val.set( "\n".join( strJumperPins ) )
 
-#        q.txJXY.config(height=q.lbJXY.winfo_height()/15)
-        q.txJXY.config(height=maxY)
+    def JUMP_ACT_txSize_and_delete(q):
+        q.JUMP_ACT_variables()
 
-        if maxY != q.maxY: 
+        q.txJXY.config(height = q.maxY)
+
+        #if maxY != q.maxY: 
             #that means that the height of text has changed
-            q.txJXY.delete(1.0, END)
-            q.txJXY.insert(INSERT, "\n" * (maxY-1) )
+        q.txJXY.delete(1.0, END)
+        q.txJXY.insert(INSERT, "\n" * (q.maxY-1) )
+
+    def JUMP_regenerate(q, *whatever):
+        ''' Generates JX_[1:Y] list inside txJXY'''
+        q.JUMP_ACT_pinLabels()
+        q.JUMP_ACT_txSize_and_delete()
+               
+#        q.txJXY.config(height=q.lbJXY.winfo_height()/15)
 
         #if JX != q.curJX: 
-        q.curJX = JX
-        q.maxY = maxY
+#        q.curJX = JX
+#        q.maxY = maxY
 #        print( "%s=%s" % (k,v) for k,v in zip(range(5),range(5)) )
         #print(dir(q.txJXY))
         #q.txJXY.insert(INSERT,"\n".join("J%i_" % X 
@@ -718,7 +742,7 @@ class ExampleApp(frame):
         #print(tk.TOP())
         #print(tk.BOTTOM)
         q.LOAD_pinmuxFname_fromSettings()
-        q.genJXY()
+        q.JUMP_regenerate()
         q.POPULATE_PTs_from_txJXY()
         q.mainloop()
     def KEY_disable(q, evt):          
@@ -785,13 +809,15 @@ class ExampleApp(frame):
 
     def GET_addMoreList_from_PTs(q):
         ls = []
-        for iport in range(0, q.numOfPorts):
+        for iport in range(0, q.numOfPorts - 1):
             ipin = 0
             for pin_val in q.PTs[q.portLetters[iport]]:
                 if pin_val != q.str_void:
 #                ls = [ '='.join( [q.portLetters[iport], pin + string(ipin) ] )  ]
                     ls.append( "%c%i=%s" % (q.portLetters[iport], ipin, pin_val ) )
                 ipin += 1
+                if ipin == 32:
+                    break
         return ls
 #            addmorestr = '\n'.join(ls)
  #           print(addmorestr)
