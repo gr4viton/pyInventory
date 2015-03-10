@@ -809,7 +809,7 @@ class ExampleApp(frame):
 
     def GET_addMoreList_from_PTs(q):
         ls = []
-        for iport in range(0, q.numOfPorts - 1):
+        for iport in range(0, q.numOfPorts):
             ipin = 0
             for pin_val in q.PTs[q.portLetters[iport]]:
                 if pin_val != q.str_void:

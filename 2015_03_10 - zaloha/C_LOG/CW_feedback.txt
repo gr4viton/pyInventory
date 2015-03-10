@@ -1,0 +1,6 @@
+
+2014_04_01
+first start of CW ever
+
+- add function from [components tab] is possible only by dragging
+add feature to add it to the position of cursor by double click and context menu

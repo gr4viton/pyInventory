@@ -1,0 +1,3 @@
+KSDK 1.1 - build 
+[] 2014_06_16 - while instruction step debugging FRDM-K64F without KSDK but with PE in debug mode.. -> changed to c/c++ mode and closed project.. -> nothing happens -> cancel, stop and afterwards stop debugging ===> hangs the whole KSDK
+hangs even after creation 

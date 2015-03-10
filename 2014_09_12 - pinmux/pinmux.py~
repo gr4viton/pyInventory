@@ -817,7 +817,7 @@ class ExampleApp(frame):
                     ls.append( "%c%i=%s" % (q.portLetters[iport], ipin, pin_val ) )
                 ipin += 1
                 if ipin == 32:
-                    return
+                    break
         return ls
 #            addmorestr = '\n'.join(ls)
  #           print(addmorestr)
