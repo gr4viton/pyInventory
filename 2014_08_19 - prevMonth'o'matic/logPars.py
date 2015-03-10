@@ -4,6 +4,16 @@ import sys
 
 from apihelper import info
 
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# typy notes
+# [x] - done
+# [L] done later than written - not knowing exactly when
+# [D] please move it from thisMonth to inbox database
+# [..] not exactly done per say.. but sort of
+# ..[] old -> not done but want to be postponed
+# [h] new - hours slept
+# [] not done yet
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 # ____________________________________________________
 # separators

@@ -36,8 +36,9 @@ def most_common(lsWords,lsIgnored):
 
 if __name__ == "__main__":
     def_ignored = ["%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"]
-    file = "dreamer.vim"    
-    with open(file, "rt") as in_file:
+    fname = "dreamer.vim"
+    fpath = "E:\\GDRIVE\\LOG\\" + fname
+    with open(fpath, "rt") as in_file:
         text = in_file.read()
     #lower
     text = text.lower()
@@ -54,7 +55,7 @@ if __name__ == "__main__":
 #    coms = []
     coms = most_common(lsWords, def_ignored)
 #    print("%%%%%%\n"+" ".join(coms))
-    nWords = 42
+    nWords = 442
 #    print( "\n".join( [ ("%s=%s" % coms[i]) for i in range(2)] ) )
 #    for com in coms[:10]: print( [ "%s = %s" % com ])
 #    print([ ("%s = %s" % com) for com in coms[:10] ])
